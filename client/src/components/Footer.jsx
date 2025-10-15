@@ -75,18 +75,22 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a
                 href="https://github.com/JaganReddy-33/"
+                 target="_blank"
+                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors duration-200"
               >
                 <FiGithub className="w-5 h-5" />
               </a>
               <a
                 href="https://www.linkedin.com/in/jaganmohanreddy33/"
+                 target="_blank"
+                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors duration-200"
               >
                 <FiLinkedin className="w-5 h-5" />
               </a>
               <a
-                href="ragipalyamjaganmohanreddy@gmail.com"
+                href="mailto:ragipalyamjaganmohanreddy@gmail.com"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors duration-200"
               >
                 <FiMail className="w-5 h-5" />
