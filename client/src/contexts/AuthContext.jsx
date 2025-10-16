@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
           payload: { user: parsedUser, token },
         });
       } catch (error) {
+        console.error('Failed to parse user from localStorage', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         dispatch({ type: 'LOGOUT' });

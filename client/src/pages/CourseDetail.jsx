@@ -38,6 +38,7 @@ const CourseDetail = () => {
           setProgress(progressResponse.data);
         }
       } catch (error) {
+        console.warn('Not enrolled in this course:', error);
         // Not enrolled
         setEnrollment(null);
       }

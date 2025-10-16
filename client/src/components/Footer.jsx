@@ -101,7 +101,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2024 LearnHub. All rights reserved. Built with ❤️ for learners worldwide.
+            © 2025 LearnHub. All rights reserved. Built with ❤️ for learners worldwide.
           </p>
         </div>
       </div>

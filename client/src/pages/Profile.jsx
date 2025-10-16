@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiEdit3, FiSave, FiX, FiCamera, FiLock } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,20 +23,17 @@ const Profile = () => {
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
+  // Handle profile input change
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle password input change
   const handlePasswordChange = (e) => {
-    setPasswordData({
-      ...passwordData,
-      [e.target.name]: e.target.value,
-    });
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
+  // Save profile updates
   const handleSave = async () => {
     try {
       setLoading(true);
@@ -51,6 +48,7 @@ const Profile = () => {
     }
   };
 
+  // Cancel editing
   const handleCancel = () => {
     setFormData({
       name: user?.name || '',
@@ -61,6 +59,7 @@ const Profile = () => {
     setEditing(false);
   };
 
+  // Change password
   const handlePasswordUpdate = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error('New passwords do not match');
@@ -75,11 +74,7 @@ const Profile = () => {
     try {
       setLoading(true);
       await authAPI.changePassword(passwordData);
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setShowPasswordForm(false);
       toast.success('Password updated successfully!');
     } catch (error) {
@@ -88,6 +83,32 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
+  // Handle avatar upload
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const form = new FormData();
+      form.append('avatar', file);
+
+      const response = await authAPI.uploadAvatar(form); // Backend should accept multipart/form-data
+      setFormData({ ...formData, avatarUrl: response.data.avatarUrl });
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return <LoadingSpinner text="Loading profile..." />;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -158,22 +179,32 @@ const Profile = () => {
                     )}
                   </div>
                   {editing && (
-                    <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors duration-200">
-                      <FiCamera className="w-4 h-4" />
-                    </button>
+                    <>
+                      <button
+                        onClick={() => document.getElementById('avatarInput').click()}
+                        className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors duration-200"
+                      >
+                        <FiCamera className="w-4 h-4" />
+                      </button>
+                      <input
+                        type="file"
+                        id="avatarInput"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                      />
+                    </>
                   )}
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Profile Picture</p>
-                  <p className="text-sm text-gray-500">Click to upload a new image</p>
+                  <p className="text-sm text-gray-500">Click camera to upload</p>
                 </div>
               </div>
 
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 {editing ? (
                   <input
                     type="text"
@@ -189,9 +220,7 @@ const Profile = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                 {editing ? (
                   <input
                     type="email"
@@ -207,9 +236,7 @@ const Profile = () => {
 
               {/* Bio */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bio
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
                 {editing ? (
                   <textarea
                     name="bio"
@@ -226,9 +253,7 @@ const Profile = () => {
 
               {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Role
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
                   {user?.role === 'student' ? 'Student' : user?.role === 'teacher' ? 'Instructor' : 'Administrator'}
                 </span>
@@ -269,9 +294,7 @@ const Profile = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-4">Change Password</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Password
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
                   <input
                     type="password"
                     name="currentPassword"
@@ -281,9 +304,7 @@ const Profile = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    New Password
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
                   <input
                     type="password"
                     name="newPassword"
@@ -293,9 +314,7 @@ const Profile = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm New Password
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -334,9 +353,7 @@ const Profile = () => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Member since</span>
-                <span className="text-gray-900">
-                  {new Date(user?.createdAt).toLocaleDateString()}
-                </span>
+                <span className="text-gray-900">{new Date(user?.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Account status</span>
@@ -351,4 +368,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
